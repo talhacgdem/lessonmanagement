@@ -38,4 +38,14 @@ public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> lessonOutOfQuotaExceptionHandler(LessonOutOfQuotaException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(LessonNotFoundException.class)
+    public ResponseEntity<?> lessonNotFoundExceptionHandler(LessonNotFoundException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(StudentNotFoundException.class)
+    public ResponseEntity<?> studentNotFoundExceptionHandler(StudentNotFoundException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }
