@@ -19,6 +19,6 @@ public class Student {
     private String name;
     private String surname;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "students")
     private List<Lesson> lessons;
 }
