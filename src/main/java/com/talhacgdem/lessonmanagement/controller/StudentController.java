@@ -2,6 +2,7 @@ package com.talhacgdem.lessonmanagement.controller;
 
 import com.talhacgdem.lessonmanagement.dto.request.StudentCreateDto;
 import com.talhacgdem.lessonmanagement.dto.request.StudentLessonListDto;
+import com.talhacgdem.lessonmanagement.dto.request.StudentLessonDto;
 import com.talhacgdem.lessonmanagement.dto.request.StudentUpdateDto;
 import com.talhacgdem.lessonmanagement.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -34,4 +35,15 @@ public class StudentController {
     public ResponseEntity<?> lessonList(@RequestBody StudentLessonListDto studentLessonListDto){
         return new ResponseEntity<>(studentService.lessonList(studentLessonListDto), HttpStatus.OK);
     }
+
+    @PutMapping("lessonregister")
+    public ResponseEntity<?> lessonregister(@RequestBody StudentLessonDto studentLessonDto){
+        return new ResponseEntity<>(studentService.registerToLesson(studentLessonDto), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("lessondelete")
+    public ResponseEntity<?> lessondelete(@RequestBody StudentLessonDto studentLessonDto){
+        return new ResponseEntity<>(studentService.deleteToLesson(studentLessonDto), HttpStatus.OK);
+    }
+
 }

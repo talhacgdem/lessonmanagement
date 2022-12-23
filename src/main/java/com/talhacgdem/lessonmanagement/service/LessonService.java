@@ -6,7 +6,10 @@ import com.talhacgdem.lessonmanagement.dto.request.LessonUpdateDto;
 import com.talhacgdem.lessonmanagement.dto.response.LessonDto;
 import com.talhacgdem.lessonmanagement.dto.response.StudentDto;
 import com.talhacgdem.lessonmanagement.entity.Lesson;
+import com.talhacgdem.lessonmanagement.entity.Student;
 import com.talhacgdem.lessonmanagement.exception.LessonNotFoundException;
+import com.talhacgdem.lessonmanagement.exception.LessonOutOfQuotaException;
+import com.talhacgdem.lessonmanagement.exception.StudentDoesNotHaveLessonException;
 import com.talhacgdem.lessonmanagement.repository.LessonRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -29,9 +32,7 @@ public class LessonService {
     }
 
     public LessonDto update(LessonUpdateDto lessonUpdateDto) {
-        Lesson l = lessonRepository.findById(lessonUpdateDto.getId()).orElseThrow(
-                () -> new LessonNotFoundException(lessonUpdateDto.getId())
-        );
+        Lesson l = getLesson(lessonUpdateDto.getId());
         return modelMapper.map(lessonRepository.save(l), LessonDto.class);
     }
 
@@ -41,10 +42,38 @@ public class LessonService {
     }
 
     public List<StudentDto> studentList(LessonStudentListDto lessonStudentListDto) {
-        Lesson lesson = lessonRepository.findById(lessonStudentListDto.getId()).orElseThrow(
-                () -> new LessonNotFoundException(lessonStudentListDto.getId())
-        );
+        Lesson lesson = getLesson(lessonStudentListDto.getId());
         return lesson.getStudents().stream().map(student -> modelMapper.map(student, StudentDto.class))
                 .collect(Collectors.toList());
+    }
+
+    public List<Student> registerStudent(Long lessonId, Student student) {
+        Lesson lesson = getLesson(lessonId);
+        List<Student> students = lesson.getStudents();
+        if (students.contains(student))
+            throw new StudentDoesNotHaveLessonException(lessonId);
+        if (lesson.getQuota() > students.size()){
+            students.add(student);
+            lesson.setStudents(students);
+            return lessonRepository.save(lesson).getStudents();
+        }else{
+            throw new LessonOutOfQuotaException(lesson.getId());
+        }
+    }
+
+    public List<Student> deleteStudent(Long lessonId, Student student) {
+        Lesson lesson = getLesson(lessonId);
+        List<Student> students = lesson.getStudents();
+        if(!students.contains(student))
+            throw new StudentDoesNotHaveLessonException(lessonId);
+        students.remove(student);
+        lesson.setStudents(students);
+        return lessonRepository.save(lesson).getStudents();
+    }
+
+    private Lesson getLesson(Long lessonId){
+        return lessonRepository.findById(lessonId).orElseThrow(
+                () -> new LessonNotFoundException(lessonId)
+        );
     }
 }

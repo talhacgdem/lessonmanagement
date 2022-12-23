@@ -34,4 +34,5 @@ public class LessonController {
     public ResponseEntity<?> studentList(@RequestBody LessonStudentListDto lessonStudentListDto){
         return new ResponseEntity<>(lessonService.studentList(lessonStudentListDto), HttpStatus.OK);
     }
+
 }
