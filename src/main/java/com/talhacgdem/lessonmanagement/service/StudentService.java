@@ -29,9 +29,9 @@ public class StudentService {
     }
 
     public StudentDto update(StudentUpdateDto studentUpdateDto) {
-        Student s = studentRepository.findById(studentUpdateDto.getId()).orElseThrow(
-                () -> new StudentNotFoundException(studentUpdateDto.getId())
-        );
+        Student s = getStudent(studentUpdateDto.getId());
+        s.setName(studentUpdateDto.getName());
+        s.setSurname(studentUpdateDto.getSurname());
         return modelMapper.map(studentRepository.save(s), StudentDto.class);
     }
 
@@ -60,7 +60,7 @@ public class StudentService {
                 .collect(Collectors.toList());
     }
 
-    private Student getStudent(Long studentId) {
+    public Student getStudent(Long studentId) {
         return studentRepository.findById(studentId).orElseThrow(
                 () -> new StudentNotFoundException(studentId)
         );

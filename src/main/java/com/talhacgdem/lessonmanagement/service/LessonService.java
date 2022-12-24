@@ -9,6 +9,7 @@ import com.talhacgdem.lessonmanagement.entity.Lesson;
 import com.talhacgdem.lessonmanagement.entity.Student;
 import com.talhacgdem.lessonmanagement.exception.LessonNotFoundException;
 import com.talhacgdem.lessonmanagement.exception.LessonOutOfQuotaException;
+import com.talhacgdem.lessonmanagement.exception.StudentAlreadyRegisteredLessonException;
 import com.talhacgdem.lessonmanagement.exception.StudentDoesNotHaveLessonException;
 import com.talhacgdem.lessonmanagement.repository.LessonRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,8 @@ public class LessonService {
 
     public LessonDto update(LessonUpdateDto lessonUpdateDto) {
         Lesson l = getLesson(lessonUpdateDto.getId());
+        l.setName(lessonUpdateDto.getName());
+        l.setQuota(lessonUpdateDto.getQuota());
         return modelMapper.map(lessonRepository.save(l), LessonDto.class);
     }
 
@@ -51,11 +54,12 @@ public class LessonService {
         Lesson lesson = getLesson(lessonId);
         List<Student> students = lesson.getStudents();
         if (students.contains(student))
-            throw new StudentDoesNotHaveLessonException(lessonId);
+            throw new StudentAlreadyRegisteredLessonException(lessonId);
         if (lesson.getQuota() > students.size()){
             students.add(student);
             lesson.setStudents(students);
-            return lessonRepository.save(lesson).getStudents();
+            Lesson ls = lessonRepository.save(lesson);
+            return ls.getStudents();
         }else{
             throw new LessonOutOfQuotaException(lesson.getId());
         }
@@ -71,7 +75,7 @@ public class LessonService {
         return lessonRepository.save(lesson).getStudents();
     }
 
-    private Lesson getLesson(Long lessonId){
+    public Lesson getLesson(Long lessonId){
         return lessonRepository.findById(lessonId).orElseThrow(
                 () -> new LessonNotFoundException(lessonId)
         );

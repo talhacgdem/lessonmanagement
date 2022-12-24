@@ -53,4 +53,9 @@ public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<?> studentDoesNotHaveLessonExceptionHandler(StudentDoesNotHaveLessonException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(StudentAlreadyRegisteredLessonException.class)
+    public ResponseEntity<?> studentAlreadyRegisteredLessonExceptionHandler(StudentAlreadyRegisteredLessonException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.ALREADY_REPORTED);
+    }
 }
